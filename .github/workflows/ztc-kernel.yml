@@ -1,4 +1,4 @@
-name: ZTC Kernel Build
+name: hlfem Kernel Build
 permissions:
   contents: write  # Allow writing to repository contents (for pushing tags)
   actions: write   # Allows triggering actions
@@ -31,7 +31,7 @@ jobs:
       - name: 设定 CONFIG 环境变量
         run: |
           # Set CONFIG dynamically based on inputs values
-          CONFIG="android12-5.10-lts"
+          CONFIG="android13-5.15-lts"
 
           # Set CONFIG as an environment variable for future steps
           echo "CONFIG=$CONFIG" >> $GITHUB_ENV
@@ -68,7 +68,7 @@ jobs:
           echo "Cloning AnyKernel3 and other dependencies..."
 
           ANYKERNEL_BRANCH="gki-2.0"
-          SUSFS_BRANCH="gki-android12-5.10"
+          SUSFS_BRANCH="gki-android13-5.15"
 
           # Debug print the branches
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
@@ -85,7 +85,7 @@ jobs:
       - name: 设置 CONFIG 环境变量
         run: |
           # Set CONFIG dynamically based on inputs values
-          CONFIG="android12-5.10-lts"
+          CONFIG="android13-5.15-lts"
 
           # Set CONFIG as an environment variable for future steps
           echo "CONFIG=$CONFIG" >> $GITHUB_ENV
@@ -99,7 +99,7 @@ jobs:
           cd "$CONFIG"
           # Initialize and sync kernel source
           echo "Initializing and syncing kernel source..."
-          FORMATTED_BRANCH="android12-5.10-lts"
+          FORMATTED_BRANCH="android13-5.15-lts"
           $REPO init --depth=1 --u https://android.googlesource.com/kernel/manifest -b common-${FORMATTED_BRANCH}
           REMOTE_BRANCH=$(git ls-remote https://android.googlesource.com/kernel/common ${FORMATTED_BRANCH})
           # Sync repo and apply patches
@@ -107,7 +107,7 @@ jobs:
           $REPO --version
           $REPO --trace sync -c -j$(nproc --all)
           rm -rf common
-          git clone https://github.com/ztc1997/android_gki_kernel_5.10_common.git --recurse-submodules --depth=1 common
+          git clone https://github.com/hfdem/android_gki_kernel_5.15_common.git --recurse-submodules --depth=1 common
           # git clone https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 -b mirror-goog-main-llvm-toolchain-source --depth=1 clang
           curl -LSs "https://github.com/zzh20188/ZTC-Kenel-Build/releases/download/clang/clang-r563880.tar.gz" -o clang-r563880.tar.gz
           mkdir prebuilts-master/clang/host/linux-x86/clang-r563880
@@ -152,7 +152,7 @@ jobs:
           echo "Applying SUSFS patches..."
 
           # Copy SUSFS patches
-          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-android12-5.10.patch ./common/
+          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-android13-5.15.patch ./common/
           cp ../susfs4ksu/kernel_patches/fs/* ./common/fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./common/include/linux/
 
@@ -160,7 +160,7 @@ jobs:
           echo "Applying SukiSU specific SUSFS patch..."
 
           cd ../common
-          patch -p1 --fuzz=3 < 50_add_susfs_in_gki-android12-5.10.patch || true
+          patch -p1 --fuzz=3 < 50_add_susfs_in_gki-android13-5.15.patch || true
   
       - name: 应用新的HOOKS补丁
         run: |
@@ -283,7 +283,7 @@ jobs:
       - name: 修补 Image 文件 安卓12和安卓13(仅限sukisu)
         run: |
             echo "Patching Image file..."
-            cd "$CONFIG/out/android12-5.10/dist"
+            cd "$CONFIG/out/android13-5.15/dist"
             strings Image | grep "Linux version"
             curl -LSs "https://raw.githubusercontent.com/ShirkNeko/SukiSU_patch/refs/heads/main/kpm/patch_linux" -o patch
             chmod 777 patch
@@ -297,10 +297,10 @@ jobs:
           mkdir bootimgs
 
           echo "Creating bootimgs folder and copying images..."
-          cp ./$CONFIG/out/android12-5.10/dist/Image ./bootimgs
-          cp ./$CONFIG/out/android12-5.10/dist/Image.lz4 ./bootimgs
-          cp ./$CONFIG/out/android12-5.10/dist/Image ./
-          cp ./$CONFIG/out/android12-5.10/dist/Image.lz4 ./
+          cp ./$CONFIG/out/android13-5.15/dist/Image ./bootimgs
+          cp ./$CONFIG/out/android13-5.15/dist/Image.lz4 ./bootimgs
+          cp ./$CONFIG/out/android13-5.15/dist/Image ./
+          cp ./$CONFIG/out/android13-5.15/dist/Image.lz4 ./
 
           # Create gzip of the Image file
           gzip -n -k -f -9 ./Image > ./Image.gz
