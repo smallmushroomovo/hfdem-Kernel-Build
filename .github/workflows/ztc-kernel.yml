@@ -110,7 +110,7 @@ jobs:
           git clone https://github.com/hfdem/android_gki_kernel_5.15_common.git --recurse-submodules --depth=1 common
           # git clone https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 -b mirror-goog-main-llvm-toolchain-source --depth=1 clang
           curl -LSs "https://github.com/zzh20188/ZTC-Kenel-Build/releases/download/clang/clang-r563880.tar.gz" -o clang-r563880.tar.gz
-          mkdir prebuilts-master/clang/host/linux-x86/clang-r563880
+          mkdir -p prebuilts-master/clang/host/linux-x86/clang-r563880
           tar -xzvf clang-r563880.tar.gz -C prebuilts-master/clang/host/linux-x86/clang-r563880
           # ln -s "$(pwd)/clang/clang-r563880" "$(pwd)/prebuilts-master/clang/host/linux-x86/clang-r563880"
           cd common
